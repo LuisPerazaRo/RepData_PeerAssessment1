@@ -1,14 +1,10 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: Luis Peraza
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+Luis Peraza  
 
 ## Loading and preprocessing the data
 ###Loding R libraries
-```{r, message=FALSE, warning=FALSE, echo=TRUE}
+
+```r
   library(lubridate)
   library(plyr)
   library(ggplot2)
@@ -17,7 +13,8 @@ output:
 
 ##Loading the dataset into R.
 ####1 Load files and make dates to date format with Lubridate
-```{r, echo=TRUE}
+
+```r
 mydata <- read.csv(unz("repdata_data_activity.zip", "activity.csv"), header = TRUE)
 mydata$date <- ymd(mydata$date)
 ```
@@ -27,7 +24,8 @@ mydata$date <- ymd(mydata$date)
 
 First we estimate basic statistics, mean, median and total
 
-```{r, echo = TRUE}
+
+```r
 mydata2 <- mydata[complete.cases(mydata),]
 mean_median <- ddply(mydata2, "date", summarize, stepmean = mean(steps), 
                      stepmedian = median(steps), steptotal = sum(steps))
@@ -35,11 +33,22 @@ mean_median <- ddply(mydata2, "date", summarize, stepmean = mean(steps),
 
 Now we can create an informative plot with the histogram
 
-```{r stephistogram, fig.width= 7, echo=TRUE}
+
+```r
 hist_right <- ggplot(mean_median) + geom_histogram(aes(steptotal)) + coord_flip() + ylab("No. days")
 bar_center <- ggplot(mydata, aes(x=date, y=steps)) + geom_bar(stat = "identity")
 grid.arrange(bar_center, hist_right, ncol=2, nrow=1, widths = c(3,1))
 ```
+
+```
+## Warning: Removed 2304 rows containing missing values (position_stack).
+```
+
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](PA1_template_files/figure-html/stephistogram-1.png)
 
 The warning indicates that 2304 rows in this dataset have NA values  
 
@@ -49,25 +58,35 @@ The warning indicates that 2304 rows in this dataset have NA values
 
 This was done for the second question but it is repeated here:
 
-```{r, echo=TRUE}
+
+```r
 mydata2 <- mydata[complete.cases(mydata),]
 mean_median <- ddply(mydata2, "date", summarize, stepmean = mean(steps), 
                      stepmedian = median(steps), steptotal = sum(steps))
 ```
 
 ####4. Time series plot of the average number of steps and the median
-```{r meanandmedia, fig.width= 7, echo=TRUE}
+
+```r
 ggplot(mean_median, aes(date)) + 
   geom_line(aes(y = stepmean, colour = "stepmean")) + 
   geom_line(aes(y = stepmedian, colour = "stepmedian")) + ylab("Steps statistics")
 ```
 
+![](PA1_template_files/figure-html/meanandmedia-1.png)
+
 The plot for the median shows that many of the 5 min intervals had 0 steps which means that in all days more the half the time this person is not walking.
 
 ####5. The 5-minute interval that, on average, contains the maximum number of steps
-```{r, echo=TRUE}
+
+```r
 indx <- which.max(mydata$steps)
 mydata[indx,]
+```
+
+```
+##       steps       date interval
+## 16492   806 2012-11-27      615
 ```
 
 I am not sure what the instructors meant for "on average". I am showing the interval that had the maximum number of steps and the day it happened.
@@ -77,7 +96,8 @@ I am not sure what the instructors meant for "on average". I am showing the inte
 
 My strategy was to use the average of steps one day before and one day after for all NA values. The code is shown below:
 
-```{r, echo=TRUE}
+
+```r
 #View which dates have NA values
 aux <- subset(mydata, is.na(steps))
 mydata0 <- mydata #Make copies
@@ -95,7 +115,8 @@ rm(list = c("mydata0","mydata1","mydata3"))
 ```
 
 ###7. Histogram of number of steps after missing values
-```{r comparehistogram, fig.width=7, echo=TRUE, warning=FALSE}
+
+```r
 interptotal <- ddply(interpdata, "date", summarize, steptotal = sum(steps))
 interp_hist <- ggplot(interptotal) + geom_histogram(aes(steptotal)) + coord_flip() + ylab("No. days") + 
   ggtitle("hist.")
@@ -109,13 +130,21 @@ orig_bar  <- ggplot(mydata2, aes(x=date, y=steps)) + geom_bar(stat = "identity")
 grid.arrange(orig_bar, orig_hist, interp_bar, interp_hist,ncol=2, nrow=2, widths = c(3,1), heights = c(3,3))
 ```
 
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](PA1_template_files/figure-html/comparehistogram-1.png)
+
 
 In this case because I assumed the NAs as 0s, there were changes in the histogram for the zeros days. For the rest of the days and steps the histogram didn't change considerably.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ###8. Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
 
-```{r, echo=TRUE}
+
+```r
 #Create day of the week factor variable
 aux <- weekdays(mydata2$date)=="Sunday" | weekdays(mydata2$date)=="Saturday"
 mydata2 <- mutate(mydata2, weekday=factor(aux, labels=c("weekday","weekend")))
@@ -126,7 +155,8 @@ weekenddf <- subset(mydata2, weekday == "weekend")
 
 Ploting the results in two panels
 
-```{r weekpattern, fig.width=7, echo=TRUE}
+
+```r
 p1 <- ggplot(weekdaydf, aes(x=interval, y=steps)) + 
       stat_summary(fun.y = mean, geom = "line",colour = "red") + ylab("Weekday") +
       coord_cartesian(ylim = c(0, 220))
@@ -135,3 +165,5 @@ p2 <- ggplot(weekenddf, aes(x=interval, y=steps)) +
       coord_cartesian(ylim = c(0, 220))
 grid.arrange(p1,p2)
 ```
+
+![](PA1_template_files/figure-html/weekpattern-1.png)
