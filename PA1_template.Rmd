@@ -55,6 +55,22 @@ mean_median <- ddply(mydata2, "date", summarize, stepmean = mean(steps),
                      stepmedian = median(steps), steptotal = sum(steps))
 ```
 
+I can estimate mean and median of steps for all days
+
+mean: 
+```{r}
+    mean(mean_median$steptotal)
+```
+
+median:
+```{r}
+    median(mean_median$steptotal)
+```
+
+
+
+
+
 ####4. Time series plot of the average number of steps and the median
 ```{r meanandmedia, fig.width= 7, echo=TRUE}
 ggplot(mean_median, aes(date)) + 

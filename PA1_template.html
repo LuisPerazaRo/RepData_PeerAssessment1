@@ -158,6 +158,13 @@ grid.arrange(bar_center, hist_right, ncol=2, nrow=1, widths = c(3,1))</code></pr
 <pre class="r"><code>mydata2 &lt;- mydata[complete.cases(mydata),]
 mean_median &lt;- ddply(mydata2, &quot;date&quot;, summarize, stepmean = mean(steps), 
                      stepmedian = median(steps), steptotal = sum(steps))</code></pre>
+<p>I can estimate mean and median of steps for all days</p>
+<p>mean:</p>
+<pre class="r"><code>    mean(mean_median$steptotal)</code></pre>
+<pre><code>## [1] 10766.19</code></pre>
+<p>median:</p>
+<pre class="r"><code>    median(mean_median$steptotal)</code></pre>
+<pre><code>## [1] 10765</code></pre>
 </div>
 <div id="time-series-plot-of-the-average-number-of-steps-and-the-median" class="section level4">
 <h4>4. Time series plot of the average number of steps and the median</h4>
